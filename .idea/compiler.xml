@@ -9,5 +9,8 @@
         <module name="learn_quartz" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="learn_quartz" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
 </project>
