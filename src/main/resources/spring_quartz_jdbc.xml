@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+		Spring整合Quartz进行配置遵循下面的步骤：
+		1：定义工作任务的Job
+		2：定义触发器Trigger，并将触发器与工作任务绑定
+		3：定义调度器，并将Trigger注册到Scheduler
+	 -->
+    <!--使用JobDetailFactoryBean调用定义任务的Bean 也可以使用MethodInvokingJobDetailFactoryBean-->
+    <bean name="helloworldJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <!---->
+        <property name="name" value="helloWorldJob"/>
+        <property name="group" value="helloWorldGroup"/>
+        <!--指定具体的job类-->
+        <property name="jobClass" value="com.xiepanpan.job.HelloWorldJob"/>
+        <!-- 必须设置为true，如果为false，当没有活动的触发器与之关联时会在调度器中会删除该任务  -->
+        <property name="durability" value="true"/>
+        <!-- 指定spring容器的key，如果不设定在job中的jobmap中是获取不到spring容器的 -->
+        <!--<property name="applicationContextJobDataKey" value="applicationContext"/>-->
+    </bean>
+
+    <!-- 2.2：定义触发器Cron的Trigger，一个触发器只能和一个任务进行绑定 -->
+    <bean id="cronTriggerFactoryBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="name" value="helloWorldTrigger"/>
+        <property name="group" value="helloWorldGroup"/>
+        <!--指定Trigger绑定的job-->
+        <property name="jobDetail" ref="helloworldJob"/>
+        <property name="cronExpression" value="0/1 * * * * ?"/>
+    </bean>
+    <!--3.定义调度器 将Trigger注册到调度器中-->
+    <bean name="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="cronTriggerFactoryBean"/>
+            </list>
+        </property>
+        <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
+        <property name="configLocation" value="classpath:quartz.properties"/>
+    </bean>
+</beans>
